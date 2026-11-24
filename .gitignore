@@ -1,0 +1,6 @@
+/data/
+/server
+/file-share-go
+*.log
+.env
+.env.*

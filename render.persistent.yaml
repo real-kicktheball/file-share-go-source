@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: file-share-go
+    runtime: go
+    plan: starter
+    buildCommand: go build -o server main.go
+    startCommand: env LISTEN_ADDR="0.0.0.0:$PORT" PUBLIC_BASE_URL="$RENDER_EXTERNAL_URL" ./server
+    healthCheckPath: /
+    disk:
+      name: uploads
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /var/data/uploads
+      - key: UPLOAD_TOKEN
+        sync: false

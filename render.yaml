@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: file-share-go-demo
+    runtime: go
+    plan: free
+    buildCommand: go build -o server main.go
+    startCommand: env LISTEN_ADDR="0.0.0.0:$PORT" PUBLIC_BASE_URL="$RENDER_EXTERNAL_URL" ./server
+    healthCheckPath: /
+    envVars:
+      - key: UPLOAD_TOKEN
+        sync: false

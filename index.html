@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이미지 파일 공유</title>
+<style>
+:root { font: 17px/1.6 "Source Sans 3",system-ui,sans-serif; color:#193730; background:#f3f6f2 }
+main { max-width:32rem; margin:8vh auto; padding:2rem; background:white; border:1px solid #cad7cc; border-radius:12px }
+label { display:block; margin-top:1.25rem; font-weight:600 }
+input { display:block; margin-top:.35rem; max-width:100%; font:inherit }
+button { margin-top:1.5rem; padding:.55rem 1rem; background:#215844; color:white; border:0; border-radius:5px; font:inherit; cursor:pointer }
+a { color:#215844; overflow-wrap:anywhere }
+</style>
+<main>
+<h1>이미지 파일 공유</h1>
+<p>PNG 또는 JPEG 한 장을 올리면 다운로드 링크가 생긴다. 최대 10 MiB, 1600만 픽셀까지 올릴 수 있다.</p>
+<form id="form" method="post" enctype="multipart/form-data" action="/api/files">
+<label>업로드 토큰 <input id="token" type="password" required></label>
+<label>이미지 파일 <input name="file" type="file" accept=".png,.jpg,.jpeg" required></label>
+<button>업로드</button>
+</form>
+<p id="status" role="status"></p>
+<a id="link" hidden></a>
+</main>
+<script>
+const form = document.querySelector("form");
+const statusText = document.querySelector("#status");
+const link = document.querySelector("#link");
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+  link.hidden = true;
+  form.querySelector("button").disabled = true;
+  statusText.textContent = "올리는 중…";
+  try {
+    const response = await fetch(form.action, {
+      method: "POST",
+      headers: {Authorization: "Bearer " + document.querySelector("#token").value},
+      body: new FormData(form)
+    });
+    if (!response.ok) throw new Error((await response.text()).trim());
+    const result = await response.json();
+    link.href = result.url;
+    link.textContent = result.url;
+    link.hidden = false;
+    statusText.textContent = "링크를 누르면 다운로드할 수 있다.";
+  } catch (err) {
+    statusText.textContent = err.message;
+  } finally {
+    form.querySelector("button").disabled = false;
+  }
+});
+</script>
+</html>
